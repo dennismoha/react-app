@@ -1,61 +1,53 @@
-import React, { Component } from 'react';
-import ReactGA from 'react-ga';
-import $ from 'jquery';
+
 import './App.css';
-import Header from './Components/Header';
-import Footer from './Components/Footer';
-import About from './Components/About';
-import Resume from './Components/Resume';
-import Contact from './Components/Contact';
-import Testimonials from './Components/Testimonials';
-import Portfolio from './Components/Portfolio';
+import Home from './Component/Home';
 
-class App extends Component {
+import React from "react";
+import { BrowserRouter , Switch, Route } from "react-router-dom";
+import UtilState from './context/utils/UtilState';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import NotFound from './pages/Error/NotFound';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import StudentRegisterState from './context/Register/StudentRegisterState';
+import Profile from './pages/home_pages/Profile';
+// import ProfileSettings  from './pages/home_pages/ProfileSettings';
+import PrivateRoute from './util/PrivateRoute';
+import {setAuthToken} from './axios/SetAuthToken'
+import ViewProfile from './pages/home_pages/ViewProfile';
 
-  constructor(props){
-    super(props);
-    this.state = {
-      foo: 'bar',
-      resumeData: {}
-    };
 
-    ReactGA.initialize('UA-110570651-1');
-    ReactGA.pageview(window.location.pathname);
+if (localStorage.token) {
+  setAuthToken(localStorage.token);
+}
 
-  }
+function App() {
+  return (
+    <>
+      <StudentRegisterState>
+        <UtilState>
+          <BrowserRouter>
+            <Switch>
+              <Route path="/" exact component={Home} />
+             
+              <Route path="/login" exact component={Login} />
+              <Route path="/register" exact component={Register} />
+              <Route path="/recoverpassword" exact component={ForgotPassword} />
+              <PrivateRoute path="/profile/viewprofile" exact component={ViewProfile} />
+           
+              <PrivateRoute path="/profile" exact component={Profile} />
 
-  getResumeData(){
-    $.ajax({
-      url:'/resumeData.json',
-      dataType:'json',
-      cache: false,
-      success: function(data){
-        this.setState({resumeData: data});
-      }.bind(this),
-      error: function(xhr, status, err){
-        console.log(err);
-        alert(err);
-      }
-    });
-  }
+          
 
-  componentDidMount(){
-    this.getResumeData();
-  }
+              <Route path="*" exact={true} component={NotFound} />
+            </Switch>
+          </BrowserRouter>
+        </UtilState>
+      </StudentRegisterState>
 
-  render() {
-    return (
-      <div className="App">
-        <Header data={this.state.resumeData.main}/>
-        <About data={this.state.resumeData.main}/>
-        <Resume data={this.state.resumeData.resume}/>
-        <Portfolio data={this.state.resumeData.portfolio}/>
-        <Testimonials data={this.state.resumeData.testimonials}/>
-        <Contact data={this.state.resumeData.main}/>
-        <Footer data={this.state.resumeData.main}/>
-      </div>
-    );
-  }
+      {/* <Test /> */}
+    </>
+  );
 }
 
 export default App;
