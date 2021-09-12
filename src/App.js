@@ -1,75 +1,61 @@
-
+import React, { Component } from 'react';
+import ReactGA from 'react-ga';
+import $ from 'jquery';
 import './App.css';
-import Home from './Component/Home';
-import Test from './Test';
-import React from "react";
-import { BrowserRouter , Switch, Route, Link } from "react-router-dom";
-import UtilState from './context/utils/UtilState';
-import StudentProfile from './pages/students/StudentProfile';
-import EditStudent from './pages/students/EditStudent';
-import Dashboard1 from './pages/dashboard/Dashboard1';
-import Dashboard2 from './pages/dashboard/Dashboard2';
-import AddProffessor from './pages/professors/AddProffessor';
-import EditProfessor from './pages/professors/EditProfessor';
-import ViewProfessors from './pages/professors/ViewProfessors';
-import ProffessorProfile from './pages/professors/ProffessorProfile';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import NotFound from './pages/Error/NotFound';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import StudentRegisterState from './context/Register/StudentRegisterState';
-import Profile from './pages/home_pages/Profile';
-import ProfileSettings  from './pages/home_pages/ProfileSettings';
-import PrivateRoute from './util/PrivateRoute';
-import {setAuthToken} from './axios/SetAuthToken'
-import ViewProfile from './pages/home_pages/ViewProfile';
+import Header from './Components/Header';
+import Footer from './Components/Footer';
+import About from './Components/About';
+import Resume from './Components/Resume';
+import Contact from './Components/Contact';
+import Testimonials from './Components/Testimonials';
+import Portfolio from './Components/Portfolio';
 
+class App extends Component {
 
-if (localStorage.token) {
-  setAuthToken(localStorage.token);
-}
+  constructor(props){
+    super(props);
+    this.state = {
+      foo: 'bar',
+      resumeData: {}
+    };
 
-function App() {
-  return (
-    <>
-      <StudentRegisterState>
-        <UtilState>
-          <BrowserRouter>
-            <Switch>
-              <Route path="/" exact component={Home} />
-              <Route path="/studentProfile" exact component={StudentProfile} />
-              <Route path="/editStudent" exact component={EditStudent} />
-              <Route path="/dashboard1" exact component={Dashboard1} />
-              <Route path="/dashboard2" exact component={Dashboard2} />
-              <Route path="/addproffessor" exact component={AddProffessor} />
-              <Route path="/viewproffessors" exact component={ViewProfessors} />
-              <Route path="/editproffessor" exact component={EditProfessor} />
-              <Route path="/login" exact component={Login} />
-              <Route path="/register" exact component={Register} />
-              <Route path="/recoverpassword" exact component={ForgotPassword} />
-              <PrivateRoute path="/profile/viewprofile" exact component={ViewProfile} />
-              <PrivateRoute
-                path="/profile/settings"
-                exact
-                component={ProfileSettings}
-              />
-              <PrivateRoute path="/profile" exact component={Profile} />
+    ReactGA.initialize('UA-110570651-1');
+    ReactGA.pageview(window.location.pathname);
 
-              <Route
-                path="/proffessorprofile"
-                exact
-                component={ProffessorProfile}
-              />
+  }
 
-              <Route path="*" exact={true} component={NotFound} />
-            </Switch>
-          </BrowserRouter>
-        </UtilState>
-      </StudentRegisterState>
+  getResumeData(){
+    $.ajax({
+      url:'/resumeData.json',
+      dataType:'json',
+      cache: false,
+      success: function(data){
+        this.setState({resumeData: data});
+      }.bind(this),
+      error: function(xhr, status, err){
+        console.log(err);
+        alert(err);
+      }
+    });
+  }
 
-      {/* <Test /> */}
-    </>
-  );
+  componentDidMount(){
+    this.getResumeData();
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <Header data={this.state.resumeData.main}/>
+        <About data={this.state.resumeData.main}/>
+        <Resume data={this.state.resumeData.resume}/>
+        <Portfolio data={this.state.resumeData.portfolio}/>
+        <Testimonials data={this.state.resumeData.testimonials}/>
+        <Contact data={this.state.resumeData.main}/>
+        <Footer data={this.state.resumeData.main}/>
+      </div>
+    );
+  }
 }
 
 export default App;
