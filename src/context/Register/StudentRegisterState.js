@@ -4,7 +4,6 @@
 // import ContactReducer from "./ContactReducer";
 
 import React, { useReducer } from "react";
-import axios from "axios";
 import studentRegisterContext from "./studentRegisterContext";
 import studentRegisterReducer from "./studentRegisterReducer";
 import Axios from '../../AxiosInstance'
@@ -140,7 +139,7 @@ const StudentRegisterState = (props) => {
                 type: LOGIN_SUCCESS,
                 payload: res.data,
             });
-            
+
             loadUser();
         } catch (error) {
             console.log("login error data", error);
